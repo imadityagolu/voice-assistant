@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import { FaMicrophoneAlt } from "react-icons/fa";
 
 export default function App() {
   const [status, setStatus] = useState('Idle')
@@ -69,38 +70,95 @@ export default function App() {
   }
 
   return (
-    <div className="container">
+    <div style={{
+      width:'900px',
+      margin:'0 auto',
+      padding:'24px',
+      overflow:'auto',
+    }}>
       <h1>AI Voice Assistant</h1>
 
-      <div className="controls">
+      {/* text box */}
+      <div style={{
+        marginTop:'16px',
+        display:'grid',
+        gap:'16px',
+      }}>
+        <div style={{
+          background:'#1e293b',
+          borderRadius:'12px',
+          padding:'16px',
+          minHeight:'340px',
+          maxHeight:'350px',
+          overflowY:'auto',
+        }}>
+          <span>Assistant</span>
+          <div className="text" style={{overflowY: 'auto'}}>{response}</div>
+        </div>
+        <div className="panelUser" style={{
+          background:'#1e293b',
+          borderRadius:'12px',
+          padding:'16px',
+          minHeight:'120px',
+        }}>
+          <span>You said</span>
+          <div className="text">{transcript}</div>
+        </div>
+      </div>
+
+      {/* result box */}
+      <div style={{
+        marginTop:'16px',
+        marginBottom:'16px',
+        display:'flex',
+        gap:'12px',
+        alignItems:'center',
+      }}>
         <button onClick={() => {
           if (!recognitionRef.current) recognitionRef.current = setupRecognition()
           if (!recognitionRef.current) return
           finalTranscriptRef.current = ''
           setListening(true)
           recognitionRef.current.start()
-        }} disabled={listening}>Start Listening</button>
+        }} disabled={listening}>
+          <FaMicrophoneAlt />
+        </button>
         <button onClick={() => {
           if (recognitionRef.current && listening) recognitionRef.current.stop()
           const prompt = transcript.trim()
           if (prompt) generateReply(prompt)
-        }} disabled={!listening}>Stop</button>
-        <span className="status">{status}</span>
+        }} 
+        disabled={!listening}
+        >
+          GO
+        </button>
+        <span style={{
+          fontSize:'0.95rem',
+          color:'#94a3b8'
+          }}>{status}</span>
       </div>
 
-      <div className="panels">
-        <div className="panel">
-          <h2>You said</h2>
-          <div className="text">{transcript}</div>
-        </div>
-        <div className="panel">
-          <h2>Assistant</h2>
-          <div className="text">{response}</div>
-        </div>
-      </div>
-
-      <div className="fallback">
-        <textarea ref={textInputRef} rows={3} placeholder="If mic isn’t supported, type here..."></textarea>
+      {/* type box */}
+      <div style={{
+        marginTop:'16px',
+        display:'flex',
+        gap:'12px',
+        alignItems:'flex-start',
+      }}>
+        <textarea 
+        ref={textInputRef} 
+        rows={1} 
+        placeholder="Type here to search..."
+        style={{
+          flex:'1',
+          padding:'10px',
+          borderRadius:'8px',
+          border:'1px solid #334155',
+          background:'#0b1220',
+          color:'#e2e8f0',
+        }}
+        >
+        </textarea>
         <button onClick={() => {
           const prompt = textInputRef.current?.value?.trim()
           if (!prompt) return
@@ -110,9 +168,6 @@ export default function App() {
         }}>Ask</button>
       </div>
 
-      <div className="note">
-        Frontend runs with Vite. Backend API at http://localhost:3000/api/generate
-      </div>
     </div>
   )
 }
