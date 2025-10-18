@@ -70,12 +70,7 @@ export default function App() {
   }
 
   return (
-    <div style={{
-      width:'900px',
-      margin:'0 auto',
-      padding:'24px',
-      overflow:'auto',
-    }}>
+    <div className="container">
       <h1>AI Voice Assistant</h1>
 
       {/* text box */}
@@ -84,36 +79,18 @@ export default function App() {
         display:'grid',
         gap:'16px',
       }}>
-        <div style={{
-          background:'#1e293b',
-          borderRadius:'12px',
-          padding:'16px',
-          minHeight:'340px',
-          maxHeight:'350px',
-          overflowY:'auto',
-        }}>
+        <div className="panelAssistant">
           <span>Assistant</span>
           <div className="text" style={{overflowY: 'auto'}}>{response}</div>
         </div>
-        <div className="panelUser" style={{
-          background:'#1e293b',
-          borderRadius:'12px',
-          padding:'16px',
-          minHeight:'120px',
-        }}>
+        <div className="panelUser">
           <span>You said</span>
           <div className="text">{transcript}</div>
         </div>
       </div>
 
       {/* result box */}
-      <div style={{
-        marginTop:'16px',
-        marginBottom:'16px',
-        display:'flex',
-        gap:'12px',
-        alignItems:'center',
-      }}>
+      <div className="controls">
         <button onClick={() => {
           if (!recognitionRef.current) recognitionRef.current = setupRecognition()
           if (!recognitionRef.current) return
@@ -132,31 +109,16 @@ export default function App() {
         >
           GO
         </button>
-        <span style={{
-          fontSize:'0.95rem',
-          color:'#94a3b8'
-          }}>{status}</span>
+        <span className="status">{status}</span>
       </div>
 
       {/* type box */}
-      <div style={{
-        marginTop:'16px',
-        display:'flex',
-        gap:'12px',
-        alignItems:'flex-start',
-      }}>
+      <div className="typeBox">
         <textarea 
+        className="input"
         ref={textInputRef} 
         rows={1} 
         placeholder="Type here to search..."
-        style={{
-          flex:'1',
-          padding:'10px',
-          borderRadius:'8px',
-          border:'1px solid #334155',
-          background:'#0b1220',
-          color:'#e2e8f0',
-        }}
         >
         </textarea>
         <button onClick={() => {
