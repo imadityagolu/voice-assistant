@@ -74,14 +74,10 @@ export default function App() {
       <h1>AI Voice Assistant</h1>
 
       {/* text box */}
-      <div style={{
-        marginTop:'16px',
-        display:'grid',
-        gap:'16px',
-      }}>
+      <div className="textBox">
         <div className="panelAssistant">
           <span>Assistant</span>
-          <div className="text" style={{overflowY: 'auto'}}>{response}</div>
+          <div className="text">{response}</div>
         </div>
         <div className="panelUser">
           <span>You said</span>
@@ -109,7 +105,7 @@ export default function App() {
         >
           GO
         </button>
-        <span className="status">{status}</span>
+        <span className="status">'{status}'</span>
       </div>
 
       {/* type box */}
@@ -127,7 +123,7 @@ export default function App() {
           setTranscript(prompt)
           textInputRef.current.value = ''
           generateReply(prompt)
-        }}>Ask</button>
+        }}>Search</button>
       </div>
 
     </div>
