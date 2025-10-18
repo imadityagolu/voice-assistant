@@ -44,6 +44,10 @@ button[disabled] {
     color: #94a3b8;
 }
 
+.assistant-text {
+    color: #94a3b8;
+}
+
 .panels {
     display: grid;
     /* grid-template-columns: 1fr 1fr; */
@@ -64,7 +68,7 @@ button[disabled] {
     background: #1e293b;
     border-radius: 12px;
     padding: 16px;
-    min-height: 120px;
+    min-height: 50px;
     margin-top: 16px;
 }
 
@@ -90,7 +94,6 @@ button[disabled] {
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    margin-top: 16px;
 }
 
 .input {

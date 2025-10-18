@@ -3,13 +3,14 @@ import './App.css'
 import { FaMicrophoneAlt } from "react-icons/fa";
 
 export default function App() {
-  const [status, setStatus] = useState('Idle')
+  const [status, setStatus] = useState('Tap on mic to speak then hit GO !')
   const [listening, setListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [response, setResponse] = useState('')
   const textInputRef = useRef(null)
   const recognitionRef = useRef(null)
   const finalTranscriptRef = useRef('')
+  const [speaking, setSpeaking] = useState(false)
 
   function setupRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -24,7 +25,7 @@ export default function App() {
 
     r.onstart = () => setStatus('Listening…')
     r.onend = () => {
-      setStatus('Stopped')
+      setStatus('Tap again on mic to speak...')
       setListening(false)
     }
     r.onerror = (e) => setStatus(`Error: ${e.error}`)
@@ -61,6 +62,9 @@ export default function App() {
         const utter = new SpeechSynthesisUtterance(text)
         utter.rate = 1
         utter.pitch = 1
+        utter.onstart = () => setSpeaking(true)
+        utter.onend = () => setSpeaking(false)
+        utter.onerror = () => setSpeaking(false)
         window.speechSynthesis.cancel()
         window.speechSynthesis.speak(utter)
       }
@@ -76,11 +80,11 @@ export default function App() {
       {/* text box */}
       <div className="textBox">
         <div className="panelAssistant">
-          <span>Assistant</span>
+          <span className="assistant-text">Result:</span>
           <div className="text">{response}</div>
         </div>
         <div className="panelUser">
-          <span>You said</span>
+          <span className="status">{status}</span>
           <div className="text">{transcript}</div>
         </div>
       </div>
@@ -97,34 +101,40 @@ export default function App() {
           <FaMicrophoneAlt />
         </button>
         <button onClick={() => {
-          if (recognitionRef.current && listening) recognitionRef.current.stop()
-          const prompt = transcript.trim()
-          if (prompt) generateReply(prompt)
-        }} 
-        disabled={!listening}
+          if (speaking) {
+            window.speechSynthesis.cancel()
+            setSpeaking(false)
+            return
+          }
+          if (recognitionRef.current && listening) {
+            recognitionRef.current.stop()
+            const prompt = transcript.trim()
+            if (prompt) generateReply(prompt)
+          }
+        }}
+          disabled={!listening && !speaking}
         >
-          GO
+          {speaking ? 'Stop' : listening ? 'GO' : 'GO'}
         </button>
-        <span className="status">'{status}'</span>
+        <div className="typeBox">
+          <textarea
+            className="input"
+            ref={textInputRef}
+            rows={1}
+            cols={89}
+            placeholder="Type here to search..."
+          >
+          </textarea>
+          <button onClick={() => {
+            const prompt = textInputRef.current?.value?.trim()
+            if (!prompt) return
+            setTranscript(prompt)
+            textInputRef.current.value = ''
+            generateReply(prompt)
+          }}>Search</button>
+        </div>
       </div>
 
-      {/* type box */}
-      <div className="typeBox">
-        <textarea 
-        className="input"
-        ref={textInputRef} 
-        rows={1} 
-        placeholder="Type here to search..."
-        >
-        </textarea>
-        <button onClick={() => {
-          const prompt = textInputRef.current?.value?.trim()
-          if (!prompt) return
-          setTranscript(prompt)
-          textInputRef.current.value = ''
-          generateReply(prompt)
-        }}>Search</button>
-      </div>
 
     </div>
   )
