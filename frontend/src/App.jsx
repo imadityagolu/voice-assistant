@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import './index.css'
-import { FaMicrophoneAlt,FaSearchengin } from 'react-icons/fa'
-import { TbWorldSearch } from "react-icons/tb";
+import { FaMicrophoneAlt, FaSearchengin } from 'react-icons/fa'
+import { TbWorldSearch, TbRobot } from "react-icons/tb";
+import { RiRobot2Line } from "react-icons/ri";
 
 export default function App() {
-  const [status, setStatus] = useState('Tap on mic to speak then hit GO !')
+  const [status, setStatus] = useState('Speak/Text to search...')
   const [listening, setListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [response, setResponse] = useState('')
@@ -27,7 +28,7 @@ export default function App() {
 
     r.onstart = () => setStatus('Listening…')
     r.onend = () => {
-      setStatus('Tap again on mic to speak...')
+      setStatus('Speak/Text to search...')
       setListening(false)
     }
     r.onerror = (e) => setStatus(`Error: ${e.error}`)
@@ -45,6 +46,7 @@ export default function App() {
   }
 
   async function generateReply(prompt) {
+    setStatus('Speak/Text to search...')
     setResponse('Thinking…')
     setLoading(true)
     try {
@@ -83,30 +85,27 @@ export default function App() {
       <div className="container-max mx-auto p-6 w-[100%]">
         <h1 className="text-3xl font-bold mb-4">AI Voice Assistant</h1>
 
-        {loading && (
-          <div className="inline-flex items-center gap-2 text-slate-400">
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25" />
-              <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-            </svg>
-            <span>Thinking…</span>
-          </div>
-        )}
-
         {/* text box */}
         <div className="grid gap-4">
           <div className="bg-slate-800 rounded-xl p-4 min-h-[450px] max-h-[450px] overflow-auto">
-            <span className="text-slate-400">Result:</span>
             <div className="whitespace-pre-wrap leading-relaxed mt-2">
-              {response || '...will be displayed here'}
+              {loading && (
+                <div className="inline-flex items-center gap-2 text-slate-400">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25" />
+                    <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                  </svg>
+                </div>
+              )}
+              {response || <RiRobot2Line />}
             </div>
           </div>
-          <div className="bg-slate-800 rounded-xl p-4">
+          {/* <div className="bg-slate-800 rounded-xl p-4">
             <span className="text-sm text-slate-400">{status}</span>
             <div className="mt-2 whitespace-pre-wrap leading-relaxed">
               {transcript || ''}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* controls */}
@@ -147,12 +146,13 @@ export default function App() {
           >
             {speaking ? 'Stop' : 'GO'}
           </button>
+
           <div className="flex items-start gap-3 flex-1">
             <textarea
               className="flex-1 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 min-h-[42px]"
-              ref={textInputRef}
+              ref={textInputRef ? textInputRef : transcript}
               rows={1}
-              placeholder="Type to search..."
+              placeholder={ speaking ? 'Generating Result...' : transcript ? transcript : status}
               disabled={loading}
             />
             <button
