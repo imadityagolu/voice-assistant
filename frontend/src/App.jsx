@@ -3,9 +3,10 @@ import './index.css'
 import { FaMicrophoneAlt, FaSearchengin } from 'react-icons/fa'
 import { TbWorldSearch, TbRobot } from "react-icons/tb";
 import { RiRobot2Line } from "react-icons/ri";
+import { PiSpeakerSlashFill } from "react-icons/pi";
 
 export default function App() {
-  const [status, setStatus] = useState('Speak/Text to search...')
+  const [status, setStatus] = useState('Speak / Type to search...')
   const [listening, setListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const [response, setResponse] = useState('')
@@ -29,8 +30,10 @@ export default function App() {
 
     r.onstart = () => setStatus('Listening…')
     r.onend = () => {
-      setStatus('Speak/Text to search...')
+      setStatus('Speak / Type to search...')
       setListening(false)
+      // Copy final spoken transcript into the textbox so it’s editable
+      setInputValue(finalTranscriptRef.current.trim())
     }
     r.onerror = (e) => setStatus(`Error: ${e.error}`)
     r.onresult = (event) => {
@@ -47,7 +50,7 @@ export default function App() {
   }
 
   async function generateReply(prompt) {
-    setStatus('Speak/Text to search...')
+    setStatus('Speak / Type to search...')
     setResponse('Thinking…')
     setLoading(true)
     try {
@@ -81,6 +84,18 @@ export default function App() {
     }
   }
 
+  function handleSearch() {
+    if (loading) return
+    const prompt = ((inputValue || transcript || '').trim())
+    if (!prompt) return
+    if (recognitionRef.current && listening) {
+      recognitionRef.current.stop()
+    }
+    setInputValue(prompt)
+    setTranscript(prompt)
+    generateReply(prompt)
+  }
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col justify-center items-center">
       <div className="container-max mx-auto p-6 w-[100%]">
@@ -88,7 +103,7 @@ export default function App() {
 
         {/* text box */}
         <div className="grid gap-4">
-          <div className="bg-slate-800 rounded-xl p-4 min-h-[450px] max-h-[450px] overflow-auto">
+          <div className="bg-slate-800 rounded-xl p-4 min-h-[600px] max-h-[600px] overflow-auto">
             <div className="whitespace-pre-wrap leading-relaxed mt-2">
               {loading && (
                 <div className="inline-flex items-center gap-2 text-slate-400">
@@ -111,6 +126,16 @@ export default function App() {
 
         {/* controls */}
         <div className="flex items-center gap-3 mt-4 mb-4">
+          <div className="flex items-start gap-3 flex-1">
+            <textarea
+              className="flex-1 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 min-h-[42px]"
+              ref={textInputRef}
+              rows={1}
+              placeholder={ speaking ? 'Generating Result...' : transcript ? transcript : status}
+              disabled={loading}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
           <button
             onClick={() => {
               if (!recognitionRef.current) recognitionRef.current = setupRecognition()
@@ -127,54 +152,14 @@ export default function App() {
           >
             <span className="text-[24px]"><FaMicrophoneAlt /></span>
           </button>
-          <button
-            onClick={() => {
-              if (speaking) {
-                window.speechSynthesis.cancel()
-                setSpeaking(false)
-                return
-              }
-              if (recognitionRef.current && listening) {
-                recognitionRef.current.stop()
-                const prompt = transcript.trim()
-                if (prompt) {
-                  setInputValue(prompt)
-                  generateReply(prompt)
-                }
-              }
-            }}
-            disabled={(!listening && !speaking) || loading}
-            className={`rounded-lg px-4 py-2 font-semibold transition-colors
-              ${(!listening && !speaking) || loading ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
-            `}
-          >
-            {speaking ? 'Stop' : <FaSearchengin className="text-[24px]" />}
-          </button>
-
-          <div className="flex items-start gap-3 flex-1">
-            <textarea
-              className="flex-1 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 min-h-[42px]"
-              ref={textInputRef}
-              rows={1}
-              cols={89}
-              placeholder={ speaking ? 'Generating Result...' : transcript ? transcript : status}
-              disabled={loading}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
             <button
-              onClick={() => {
-                const prompt = (inputValue || '').trim()
-                if (!prompt) return
-                setTranscript(prompt)
-                generateReply(prompt)
-              }}
-              disabled={loading || !(inputValue || '').trim()}
+              onClick={handleSearch}
+              disabled={loading || !((inputValue || transcript || '').trim())}
               className={`rounded-lg px-4 py-2 font-semibold transition-colors
-                ${(loading || !(inputValue || '').trim()) ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
+                ${(loading || !((inputValue || transcript || '').trim())) ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
               `}
             >
-               {loading ? <TbWorldSearch className="text-[24px]" /> : <FaSearchengin className="text-[24px]" />}
+               {loading ? <TbWorldSearch className="text-[24px]" /> : speaking ? <PiSpeakerSlashFill className="text-[24px]" /> : <FaSearchengin className="text-[24px]" />}
              </button>
           </div>
         </div>
