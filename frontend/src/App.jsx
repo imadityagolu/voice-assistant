@@ -80,7 +80,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col justify-center items-center">
-      <div className="container-max mx-auto p-6">
+      <div className="container-max mx-auto p-6 w-[100%]">
         <h1 className="text-3xl font-bold mb-4">AI Voice Assistant</h1>
 
         {loading && (
@@ -98,7 +98,7 @@ export default function App() {
           <div className="bg-slate-800 rounded-xl p-4 min-h-[450px] max-h-[450px] overflow-auto">
             <span className="text-slate-400">Result:</span>
             <div className="whitespace-pre-wrap leading-relaxed mt-2">
-              {response || ''}
+              {response || '...will be displayed here'}
             </div>
           </div>
           <div className="bg-slate-800 rounded-xl p-4">
