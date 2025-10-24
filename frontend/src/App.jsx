@@ -14,6 +14,7 @@ export default function App() {
   const textInputRef = useRef(null)
   const recognitionRef = useRef(null)
   const finalTranscriptRef = useRef('')
+  const [inputValue, setInputValue] = useState('')
 
   function setupRecognition() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -136,7 +137,10 @@ export default function App() {
               if (recognitionRef.current && listening) {
                 recognitionRef.current.stop()
                 const prompt = transcript.trim()
-                if (prompt) generateReply(prompt)
+                if (prompt) {
+                  setInputValue(prompt)
+                  generateReply(prompt)
+                }
               }
             }}
             disabled={(!listening && !speaking) || loading}
@@ -144,32 +148,34 @@ export default function App() {
               ${(!listening && !speaking) || loading ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
             `}
           >
-            {speaking ? 'Stop' : 'GO'}
+            {speaking ? 'Stop' : <FaSearchengin className="text-[24px]" />}
           </button>
 
           <div className="flex items-start gap-3 flex-1">
             <textarea
               className="flex-1 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 min-h-[42px]"
-              ref={textInputRef ? textInputRef : transcript}
+              ref={textInputRef}
               rows={1}
+              cols={89}
               placeholder={ speaking ? 'Generating Result...' : transcript ? transcript : status}
               disabled={loading}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
             <button
               onClick={() => {
-                const prompt = textInputRef.current?.value?.trim()
+                const prompt = (inputValue || '').trim()
                 if (!prompt) return
                 setTranscript(prompt)
-                textInputRef.current.value = ''
                 generateReply(prompt)
               }}
-              disabled={loading}
+              disabled={loading || !(inputValue || '').trim()}
               className={`rounded-lg px-4 py-2 font-semibold transition-colors
-                ${loading ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
+                ${(loading || !(inputValue || '').trim()) ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
               `}
             >
-              {loading ? <TbWorldSearch className="text-[24px]" /> : <FaSearchengin className="text-[24px]" />}
-            </button>
+               {loading ? <TbWorldSearch className="text-[24px]" /> : <FaSearchengin className="text-[24px]" />}
+             </button>
           </div>
         </div>
 
