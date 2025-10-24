@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './index.css'
-import { FaMicrophoneAlt } from 'react-icons/fa'
+import { FaMicrophoneAlt,FaSearchengin } from 'react-icons/fa'
+import { TbWorldSearch } from "react-icons/tb";
 
 export default function App() {
   const [status, setStatus] = useState('Tap on mic to speak then hit GO !')
@@ -78,13 +79,23 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200">
+    <div className="min-h-screen bg-slate-900 text-slate-200 flex flex-col justify-center items-center">
       <div className="container-max mx-auto p-6">
         <h1 className="text-3xl font-bold mb-4">AI Voice Assistant</h1>
 
+        {loading && (
+          <div className="inline-flex items-center gap-2 text-slate-400">
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25" />
+              <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+            </svg>
+            <span>Thinking…</span>
+          </div>
+        )}
+
         {/* text box */}
         <div className="grid gap-4">
-          <div className="bg-slate-800 rounded-xl p-4 min-h-[240px]">
+          <div className="bg-slate-800 rounded-xl p-4 min-h-[450px] max-h-[450px] overflow-auto">
             <span className="text-slate-400">Result:</span>
             <div className="whitespace-pre-wrap leading-relaxed mt-2">
               {response || ''}
@@ -114,8 +125,7 @@ export default function App() {
             `}
             aria-busy={loading}
           >
-            <FaMicrophoneAlt />
-            <span>Mic</span>
+            <span className="text-[24px]"><FaMicrophoneAlt /></span>
           </button>
           <button
             onClick={() => {
@@ -142,8 +152,7 @@ export default function App() {
               className="flex-1 rounded-lg border border-slate-700 bg-slate-900 text-slate-200 px-3 py-2 min-h-[42px]"
               ref={textInputRef}
               rows={1}
-              cols={89}
-              placeholder="Type here to search..."
+              placeholder="Type to search..."
               disabled={loading}
             />
             <button
@@ -159,20 +168,11 @@ export default function App() {
                 ${loading ? 'bg-blue-600/50 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}
               `}
             >
-              {loading ? 'Working…' : 'Search'}
+              {loading ? <TbWorldSearch className="text-[24px]" /> : <FaSearchengin className="text-[24px]" />}
             </button>
           </div>
         </div>
 
-        {loading && (
-          <div className="inline-flex items-center gap-2 text-slate-400">
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.25" />
-              <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-            </svg>
-            <span>Thinking…</span>
-          </div>
-        )}
       </div>
     </div>
   )
